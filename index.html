@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes, maximum-scale=5" />
+  <meta name="description" content="Create and scan QR codes in the browser — customize colours, backgrounds, corners, then download PNG." />
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fafbff" media="(prefers-color-scheme: light)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="QR Link" />
+  <meta name="apple-mobile-web-app-icon" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230f172a' width='192' height='192'/><rect fill='%23fff' x='24' y='24' width='48' height='48' rx='6'/><rect fill='%23fff' x='120' y='24' width='48' height='48' rx='6'/><rect fill='%23fff' x='24' y='120' width='48' height='48' rx='6'/><g fill='%23fff'><rect x='120' y='120' width='12' height='12' rx='2'/><rect x='120' y='144' width='12' height='12' rx='2'/><rect x='144' y='120' width='12' height='12' rx='2'/><rect x='144' y='144' width='12' height='12' rx='2'/></g></svg>" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="color-scheme" content="light dark" />
+  <title>QR Link — Generate & scan</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230f172a'><rect x='3' y='3' width='7' height='7' rx='1'/><rect x='14' y='3' width='7' height='7' rx='1'/><rect x='3' y='14' width='7' height='7' rx='1'/><rect x='14' y='14' width='2' height='2'/><rect x='18' y='14' width='2' height='2'/><rect x='14' y='18' width='2' height='2'/><rect x='18' y='18' width='2' height='2'/></svg>" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <main id="app">
+      <header class="header">
+        <div class="header-badge" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <path d="M14 14h2v2h-2zM14 18h2v2h-2zM18 14h2v2h-2zM18 18h2v2h-2z" />
+          </svg>
+          FROST QR TOOL
+        </div>
+        <h1 class="app-title">QR Link</h1>
+        <p class="app-sub">Turn URLs into QR codes or read a QR back to a link. Style your QR, then export a PNG.</p>
+      </header>
+
+      <nav class="tabs" role="tablist" aria-label="Main sections">
+        <button type="button" class="tab active" role="tab" aria-selected="true" aria-controls="panel-generate" id="tab-generate">Link → QR</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="panel-scan" id="tab-scan">QR → Link</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="panel-history" id="tab-history">History</button>
+      </nav>
+
+      <div class="panel-wrap">
+        <section id="panel-generate" class="panel active" role="tabpanel" aria-labelledby="tab-generate">
+          <div class="input-wrap">
+            <label for="url-input">Paste your link</label>
+            <input id="url-input" class="url-input" type="url" inputmode="url" autocomplete="url" placeholder="https://example.com" />
+          </div>
+
+          <button type="button" class="gen-btn" id="btn-generate">Generate QR code</button>
+
+          <div class="qr-display" id="qr-display" hidden>
+            <div class="qr-mount" id="qr-mount" aria-live="polite"></div>
+            <div class="qr-url-label" id="qr-url-label"></div>
+            <div class="qr-actions">
+              <button type="button" class="qr-action-btn" id="btn-download-qr">Download PNG</button>
+              <button type="button" class="qr-action-btn" id="btn-save-qr">Save</button>
+              <button type="button" class="qr-action-btn" id="btn-copy-link">Copy link</button>
+            </div>
+          </div>
+
+          <details class="customize-panel" id="panel-customize">
+            <summary>
+              <span class="customize-summary-text">
+                <span class="customize-summary-title">Style &amp; encoding</span>
+                <span class="customize-summary-hint">Open after you preview a code</span>
+              </span>
+            </summary>
+            <div class="customize-inner">
+              <p class="customize-intro">Tune colours and shape, the preview redraws instantly when you have a QR generated above.</p>
+
+              <div class="customize-section">
+                <h3 class="customize-section-title">Colours</h3>
+                <div class="colour-card">
+                  <div class="field-block">
+                    <span class="field-label" id="lbl-qr-fg">Foreground (modules)</span>
+                    <div class="colour-row-main">
+                      <input type="color" id="qr-fg" class="color-picker" value="#0f172a" title="Foreground colour" aria-labelledby="lbl-qr-fg" />
+                      <div class="swatches" role="group" aria-label="Foreground presets">
+                        <button type="button" class="swatch-btn" data-fg-swatch="#0f172a" title="Ink" aria-label="Ink" style="background:#0f172a;"></button>
+                        <button type="button" class="swatch-btn" data-fg-swatch="#4338ca" title="Indigo" aria-label="Indigo" style="background:#4338ca;"></button>
+                        <button type="button" class="swatch-btn" data-fg-swatch="#059669" title="Emerald" aria-label="Emerald" style="background:#059669;"></button>
+                        <button type="button" class="swatch-btn" data-fg-swatch="#ea580c" title="Orange" aria-label="Orange" style="background:#ea580c;"></button>
+                        <button type="button" class="swatch-btn" data-fg-swatch="#dc2626" title="Red" aria-label="Red" style="background:#dc2626;"></button>
+                        <button type="button" class="swatch-btn" data-fg-swatch="#9333ea" title="Purple" aria-label="Purple" style="background:#9333ea;"></button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field-block bg-block">
+                    <div class="toggle-row compact">
+                      <input type="checkbox" id="qr-bg-transparent" />
+                      <label for="qr-bg-transparent"><span>Transparent PNG (no backdrop)</span></label>
+                    </div>
+                    <div class="bg-color-wrap" id="qr-bg-wrap">
+                      <span class="field-label" id="lbl-qr-bg">Background fill</span>
+                      <input type="color" id="qr-bg" class="color-picker color-picker-wide" value="#ffffff" aria-labelledby="lbl-qr-bg" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="customize-section">
+                <div class="section-head">
+                  <h3 class="customize-section-title">Shape</h3>
+                  <p class="section-head-note">Modules first, then the three corner eyes.</p>
+                </div>
+                <div class="preset-chips" role="group" aria-label="Quick style presets">
+                  <button type="button" class="preset-chip" data-preset="classic">Classic</button>
+                  <button type="button" class="preset-chip" data-preset="soft">Soft</button>
+                  <button type="button" class="preset-chip" data-preset="dots">Dots</button>
+                  <button type="button" class="preset-chip" data-preset="bold">Bold eyes</button>
+                </div>
+                <div class="shape-stack">
+                  <div class="field-block">
+                    <label class="field-label" for="qr-dots-type">Data modules</label>
+                    <select id="qr-dots-type" class="style-select" aria-describedby="hint-dots">
+                      <option value="square">Sharp blocks</option>
+                      <option value="rounded">Rounded tiles</option>
+                      <option value="extra-rounded">Extra rounded</option>
+                      <option value="dots">Dot matrix</option>
+                      <option value="classy">Classy notched</option>
+                      <option value="classy-rounded">Classy rounded</option>
+                    </select>
+                    <p class="helper-text tight" id="hint-dots">Between the corner markers.</p>
+                  </div>
+                  <div class="field-block">
+                    <label class="field-label" for="qr-corners-square">Corner outer frame</label>
+                    <select id="qr-corners-square" class="style-select">
+                      <option value="square">Square</option>
+                      <option value="rounded">Rounded</option>
+                      <option value="extra-rounded">Extra rounded</option>
+                      <option value="dot">Dot capsule</option>
+                      <option value="dots">Dotted outline</option>
+                      <option value="classy">Classy</option>
+                      <option value="classy-rounded">Classy rounded</option>
+                    </select>
+                  </div>
+                  <div class="field-block">
+                    <label class="field-label" for="qr-corners-dot">Corner centre</label>
+                    <select id="qr-corners-dot" class="style-select">
+                      <option value="square">Square</option>
+                      <option value="dot">Round dot</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="customize-section customize-section-last">
+                <h3 class="customize-section-title">Whitespace &amp; robustness</h3>
+                <div class="encoding-grid">
+                  <div class="field-block">
+                    <label class="field-label" for="qr-margin">Quiet zone around code</label>
+                    <div class="range-inline">
+                      <input type="range" id="qr-margin" min="4" max="24" step="2" value="10" aria-valuemin="4" aria-valuemax="24" aria-label="Quiet zone in pixels" />
+                      <span class="range-value" id="qr-margin-val">10 px</span>
+                    </div>
+                    <p class="helper-text tight">Adds padding so phones can scan printed codes.</p>
+                  </div>
+                  <div class="field-block">
+                    <label class="field-label" for="qr-error-correction">Error correction</label>
+                    <select id="qr-error-correction" class="style-select">
+                      <option value="L">Low: smallest symbol</option>
+                      <option value="M" selected>Medium: default</option>
+                      <option value="Q">Quartile: more damage tolerance</option>
+                      <option value="H">High: maximum redundancy</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <section id="panel-scan" class="panel" role="tabpanel" aria-labelledby="tab-scan" hidden>
+          <div class="camera-box" id="camera-box">
+            <video id="video" autoplay playsinline muted></video>
+            <div class="camera-placeholder" id="camera-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25">
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+              <span>Camera preview appears here</span>
+            </div>
+            <div class="scan-overlay">
+              <div class="scan-frame">
+                <div class="corner-tr"></div>
+                <div class="corner-bl"></div>
+                <div class="scan-line"></div>
+              </div>
+            </div>
+          </div>
+          <canvas id="scan-canvas" aria-hidden="true"></canvas>
+          <button type="button" class="camera-btn" id="camera-btn" aria-live="polite">Start camera</button>
+          <p class="scan-hint">
+            Uses your device camera once you grant access.
+          </p>
+
+          <div class="scan-result" id="scan-result" hidden>
+            <div class="scan-result-label">Scanned link</div>
+            <div class="scan-result-url" id="scan-url"></div>
+            <div class="result-actions">
+              <button type="button" class="result-open-btn" id="btn-open-scan">Open link</button>
+              <button type="button" class="result-save-btn" id="btn-save-scan">Save</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="panel-history" class="panel" role="tabpanel" aria-labelledby="tab-history" hidden style="padding:0;">
+          <div class="history-section">
+            <div class="history-title">
+              <span>Saved conversions</span>
+              <button type="button" class="clear-btn" id="btn-clear-history">Clear all</button>
+            </div>
+            <div id="history-list"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" crossorigin="anonymous"></script>
+  <script src="js/qr-generator.js" defer></script>
+  <script src="js/app.js" defer></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+          console.log('Service Worker registered:', registration);
+        }).catch(function(err) {
+          console.log('Service Worker registration failed:', err);
+        });
+      });
+    }
+
+  </script>
+</body>
+</html>
